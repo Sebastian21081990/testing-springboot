@@ -5,6 +5,7 @@ import com.springboot.test.models.Banco;
 import com.springboot.test.models.Cuenta;
 import com.springboot.test.repositories.BancoRepository;
 import com.springboot.test.repositories.CuentaRepository;
+import com.springboot.test.services.IBancoService;
 import com.springboot.test.services.ICuentaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -53,6 +55,8 @@ class TestSpringbootApplicationTests {
 
     @Autowired
     ICuentaService cuentaService;
+    @Autowired
+    IBancoService bancoService;
 
     /*
      * Se usa para inicializar los objetos
@@ -115,7 +119,7 @@ class TestSpringbootApplicationTests {
 
         BigDecimal monto = BigDecimal.valueOf(100);
 
-        cuentaService.transferir(1L, 1L, 2L, monto);
+        bancoService.transferir(1L, 1L, 2L, monto);
 
         BigDecimal saldoOrigen = cuentaService.revisarSaldo(1L);
         BigDecimal saldoDestino = cuentaService.revisarSaldo(2L);
@@ -125,16 +129,16 @@ class TestSpringbootApplicationTests {
         assertEquals("2100", saldoDestino.toPlainString());
 
         //Valida el nro de transferencias
-        int total = cuentaService.revisarTotalTransferencias(1L);
+        int total = bancoService.revisarTotalTransferencias(1L);
         assertEquals(1, total);
 
         //Verificar el nro de veces que es llamada el método
         verify(cuentaRepository, times(2)).findById(1L);
         verify(cuentaRepository, times(2)).findById(2L);
-        verify(cuentaRepository, times(2)).update(any(Cuenta.class));
+        verify(cuentaRepository, times(2)).save(any(Cuenta.class));
 
         verify(bancoRepository, times(2)).findById(1L);
-        verify(bancoRepository).update(any(Banco.class));
+        verify(bancoRepository).save(any(Banco.class));
 
     }
 
@@ -152,7 +156,7 @@ class TestSpringbootApplicationTests {
 
         //Lanza la excepcion
         assertThrows(DineroInsuficienteException.class, () -> {
-            cuentaService.transferir(1L, 1L, 2L, amount);
+            bancoService.transferir(1L, 1L, 2L, amount);
         });
 
         BigDecimal saldoOrigen = cuentaService.revisarSaldo(1L);
@@ -161,15 +165,15 @@ class TestSpringbootApplicationTests {
         assertEquals("1000", saldoOrigen.toPlainString());
         assertEquals("2000", saldoDestino.toPlainString());
 
-        int total = cuentaService.revisarTotalTransferencias(1L);
+        int total = bancoService.revisarTotalTransferencias(1L);
         assertEquals(0, total);
 
         verify(cuentaRepository, times(2)).findById(1L);
         verify(cuentaRepository, times(1)).findById(2L);
-        verify(cuentaRepository, never()).update(any(Cuenta.class));
+        verify(cuentaRepository, never()).save(any(Cuenta.class));
 
         verify(bancoRepository, times(1)).findById(1L);
-        verify(bancoRepository, never()).update(any(Banco.class));
+        verify(bancoRepository, never()).save(any(Banco.class));
 
         //Verificar que se llama 6 veces findById con cualquier id  de tipo long
         verify(cuentaRepository, times(3)).findById(anyLong());
@@ -182,8 +186,8 @@ class TestSpringbootApplicationTests {
 
         when(cuentaRepository.findById(1L)).thenReturn(Datos.crearCuenta001());
 
-        Cuenta cuenta1 = cuentaRepository.findById(1L);
-        Cuenta cuenta2 = cuentaRepository.findById(1L);
+        Cuenta cuenta1 = cuentaRepository.findById(1L).get();
+        Cuenta cuenta2 = cuentaRepository.findById(1L).get();
 
         //assertSame y assertTrue hacen lo mismo
         assertSame(cuenta1, cuenta2);

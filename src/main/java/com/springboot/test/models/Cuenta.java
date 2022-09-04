@@ -3,6 +3,7 @@ package com.springboot.test.models;
 import com.springboot.test.exceptions.DineroInsuficienteException;
 import lombok.*;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -11,8 +12,12 @@ import java.util.Objects;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Entity
+@Table(name = "cuentas")
 public class Cuenta {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String persona;
     private BigDecimal saldo;

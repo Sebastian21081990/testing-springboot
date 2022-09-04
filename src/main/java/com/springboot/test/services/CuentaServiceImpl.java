@@ -1,58 +1,45 @@
 package com.springboot.test.services;
 
-import com.springboot.test.models.Banco;
 import com.springboot.test.models.Cuenta;
-import com.springboot.test.repositories.BancoRepository;
 import com.springboot.test.repositories.CuentaRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class CuentaServiceImpl implements ICuentaService{
 
     private final CuentaRepository cuentaRepository;
-    private final BancoRepository bancoRepository;
 
-    public CuentaServiceImpl(CuentaRepository cuentaRepository,
-                             BancoRepository bancoRepository) {
+    public CuentaServiceImpl(CuentaRepository cuentaRepository) {
         this.cuentaRepository = cuentaRepository;
-        this.bancoRepository = bancoRepository;
     }
 
     @Override
     public Cuenta findById(Long id) {
-        return cuentaRepository.findById(id);
+        return cuentaRepository.findById(id).orElseThrow();
     }
 
     @Override
-    public Integer revisarTotalTransferencias(Long bancoId) {
-        Banco banco = bancoRepository.findById(bancoId);
-        return banco.getTotalTransferencia();
+    public Cuenta findByPerson(String person) {
+        return cuentaRepository.findByPersona(person).orElseThrow();
+    }
+
+    @Override
+    public List<Cuenta> findAll() {
+        return cuentaRepository.findAll();
+    }
+
+    @Override
+    public void update(Cuenta cuenta) {
+        cuentaRepository.save(cuenta);
     }
 
     @Override
     public BigDecimal revisarSaldo(Long cuentaId) {
         Cuenta cuenta = findById(cuentaId);
         return cuenta.getSaldo();
-    }
-
-    @Override
-    public void transferir(Long bancoId, Long numCuentaOrigen, Long numCuentaDestino, BigDecimal monto) {
-
-        Cuenta cuentaOrigen = cuentaRepository.findById(numCuentaOrigen);
-        cuentaOrigen.debito(monto);
-        cuentaRepository.update(cuentaOrigen);
-
-        Cuenta cuentaDestino = cuentaRepository.findById(numCuentaDestino);
-        cuentaDestino.credito(monto);
-        cuentaRepository.update(cuentaDestino);
-
-        Banco banco = bancoRepository.findById(bancoId);
-        Integer totalTransferencias = banco.getTotalTransferencia();
-        banco.setTotalTransferencia(++totalTransferencias);
-        bancoRepository.update(banco);
-
     }
 
 }

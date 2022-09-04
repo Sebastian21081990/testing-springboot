@@ -11,6 +11,7 @@ public interface ICuentaService {
 
     Cuenta findByPerson(String person);
     List<Cuenta> findAll();
+    Cuenta guardar(Cuenta cuenta);
     void update(Cuenta cuenta);
     BigDecimal revisarSaldo(Long cuentaId);
 

@@ -96,3 +96,5 @@ Cuenta cuenta2 = cuentaRepository.findById(1L);
 assertSame(cuenta1, cuenta2);
 assertTrue(cuenta1 == cuenta2);
 ```
+
+* * *

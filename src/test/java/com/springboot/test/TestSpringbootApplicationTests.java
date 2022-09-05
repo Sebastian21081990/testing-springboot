@@ -189,8 +189,8 @@ class TestSpringbootApplicationTests {
 
         when(cuentaRepository.findById(1L)).thenReturn(Datos.crearCuenta001());
 
-        Cuenta cuenta1 = cuentaRepository.findById(1L).get();
-        Cuenta cuenta2 = cuentaRepository.findById(1L).get();
+        Cuenta cuenta1 = cuentaService.findById(1L);
+        Cuenta cuenta2 = cuentaService.findById(1L);
 
         //assertSame y assertTrue hacen lo mismo
         assertSame(cuenta1, cuenta2);

@@ -1,8 +1,6 @@
 package com.springboot.test.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springboot.test.Datos;
 import com.springboot.test.dto.TransaccionDTO;
 import com.springboot.test.models.Cuenta;
 import com.springboot.test.services.IBancoService;
@@ -26,7 +24,6 @@ import static com.springboot.test.Datos.crearCuenta001;
 import static com.springboot.test.Datos.crearCuenta002;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;

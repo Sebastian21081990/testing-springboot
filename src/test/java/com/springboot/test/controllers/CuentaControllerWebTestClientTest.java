@@ -214,4 +214,92 @@ class CuentaControllerWebTestClientTest {
 
     }
 
+    @Test
+    @Order(6)
+    void testGuardar() {
+
+        //Given
+        Cuenta cuenta = Cuenta.builder()
+                .persona("Pepe")
+                .saldo(BigDecimal.valueOf(3000))
+                .build();
+
+
+        client.post()
+                .uri("/api/cuentas/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(cuenta)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody()
+                .jsonPath("$.id").isEqualTo(3)
+                .jsonPath("$.persona").isEqualTo("Pepe")
+                .jsonPath("$.persona").value(is("Pepe"))
+                .jsonPath("$.saldo").isEqualTo(3000);
+
+    }
+
+    @Test
+    @Order(7)
+    void testGuardar1() {
+
+        //Given
+        Cuenta cuenta = Cuenta.builder()
+                .persona("Pepa")
+                .saldo(BigDecimal.valueOf(3000))
+                .build();
+
+
+        client.post().uri("/api/cuentas/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(cuenta)
+                .exchange()
+                .expectStatus().isCreated()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody(Cuenta.class)
+                .consumeWith(respuesta -> {
+                    Cuenta c = respuesta.getResponseBody();
+                    assertNotNull(c);
+                    assertEquals(4L, c.getId());
+                    assertEquals("Pepa", c.getPersona());
+                    assertEquals("3000", c.getSaldo().toPlainString());
+                });
+
+    }
+
+    @Test
+    @Order(8)
+    void testEliminar() {
+
+        client.get().uri("/api/cuentas")
+                .exchange()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectStatus().isOk()
+                .expectBodyList(Cuenta.class)
+                .hasSize(4);
+
+        client.delete().uri("/api/cuentas/3")
+                .exchange()
+                .expectStatus().isNoContent()
+                .expectBody().isEmpty();
+
+        client.get().uri("/api/cuentas")
+                .exchange()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectStatus().isOk()
+                .expectBodyList(Cuenta.class)
+                .hasSize(3);
+
+        /*client.get().uri("/api/cuentas/3")
+                .exchange()
+                .expectStatus().is5xxServerError();*/
+
+        client.get().uri("/api/cuentas/3")
+                .exchange()
+                .expectStatus().isNotFound()
+                .expectBody().isEmpty();
+
+    }
+
 }
